@@ -11,6 +11,11 @@ from utils_logs import save_logs, save_ids, save_plot, resume
 cap = cv2.VideoCapture('../data/sheepHerd4_1.mp4')
 width, height = 640, 480
 
+fps_video = cap.get(cv2.CAP_PROP_FPS)
+frame_skip = int(fps_video)  # processing only the frame of the second
+
+print(f"FPS do vídeo: {fps_video}, analisando 1 frame a cada {frame_skip}")
+
 class_type = "sheep"  # Type of counting object
 model_path = '../models/yolo11n.pt'
 scan_type = "all" #all, line, area
@@ -65,6 +70,11 @@ while True:
     ret, frame = cap.read()
     if not ret:
         break
+
+    frame_count += 1
+
+    if frame_count % frame_skip != 0:
+        continue
 
     frame = cv2.resize(frame, (width, height))
     result = model.track(frame, persist=True, verbose=False) # Detection + Tracking
